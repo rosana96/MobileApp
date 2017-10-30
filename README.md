@@ -1,10 +1,9 @@
 # MobileApp
 
-App story:
-The app will contain a list of bible books, each bible book contains more chapters, each chapter contains more verses.
-Users can select what book/chapter they want to read.
+Collective writing
+The app contains a list of writings (novels) in progress. Each novel has an owner (the user who started writing it). Other users can submit possible continuations (let's say, a chapter) to the novel. Then, the owner can look at the list of chapter proposals and select the one he likes the most to append it to his story. He can also edit a chapter proposal before appending it to the story.
 
-Authenticated users can add comments about a chapter or a verse and they can quote a verse on their "news feed". They can also see what other users commented on that chapter/verse and they can see who quoted a verse in their "news feed" in the previous month.
+Every user can read the existing novel.
+Only an authenitcated user can start a new novel or submit a proposal for a chapter.
 
--- maybe something like replying to comments and having the possibility to send an e-mail in order to contact another user?
-
+When an owner appends the chapter to his novel, the writer of it receives an e-mail. 
