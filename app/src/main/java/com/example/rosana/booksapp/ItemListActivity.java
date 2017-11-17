@@ -45,15 +45,6 @@ public class ItemListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
@@ -65,12 +56,7 @@ public class ItemListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-//        Intent email = new Intent(Intent.ACTION_SEND);
-//        email.putExtra(Intent.EXTRA_EMAIL, new String[]{"youremail@yahoo.com"});
-//        email.putExtra(Intent.EXTRA_SUBJECT, "subject");
-//        email.putExtra(Intent.EXTRA_TEXT, "message");
-//        email.setType("message/rfc822");
-//        startActivity(Intent.createChooser(email, "Choose an Email client :"));
+
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

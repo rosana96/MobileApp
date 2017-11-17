@@ -1,17 +1,26 @@
 package com.example.rosana.booksapp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.rosana.booksapp.dummy.Content;
+import com.example.rosana.booksapp.model.MailDialog;
 import com.example.rosana.booksapp.model.Novel;
+
+import static android.content.Intent.createChooser;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -29,7 +38,7 @@ public class ItemDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private Novel novel;
+    private static Novel novel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -57,16 +66,73 @@ public class ItemDetailFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.item_detail, container, false);
-
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.item_detail, container, false);
+        final TextView textView = (TextView) rootView.findViewById(R.id.item_detail);
+        final EditText editText = (EditText) rootView.findViewById(R.id.item_detail_edit);
+        final LinearLayout linearLayout = rootView.findViewById(R.id.linear_layout);
         // Show the dummy content as text in a TextView.
         if (novel != null) {
-            ((TextView) rootView.findViewById(R.id.item_detail)).setText(novel.getContent());
+            textView.setText(novel.getContent());
+            editText.setVisibility(View.GONE);
         }
+
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "You can now edit the content", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                textView.setVisibility(View.GONE);
+                editText.setVisibility(View.VISIBLE);
+                editText.setText(novel.getContent());
+//                fab.setVisibility(View.GONE);
+                editText.requestFocus();
+                getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+//
+//        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean hasFocus) {
+//                if(!hasFocus) {
+//                    String cont = editText.getText().toString();
+//                    textView.setText(cont);
+//                    textView.setVisibility(View.VISIBLE);
+//                    editText.setVisibility(View.GONE);
+//                    novel.setContent(cont);
+//                }
+//            }
+//        });
+
+        linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (editText.getVisibility()==View.VISIBLE) {
+                    String cont = editText.getText().toString();
+                    textView.setText(cont);
+                    textView.setVisibility(View.VISIBLE);
+                    editText.setVisibility(View.GONE);
+                    novel.setContent(cont);
+                }
+            }
+        });
+
+        FloatingActionButton mail_button = rootView.findViewById(R.id.mail_button);
+        mail_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MailDialog mailDialog = new MailDialog();
+                mailDialog.GenerateDialog(getContext(), novel, getActivity());
+            }
+        });
 
         return rootView;
     }
+
 }
-// e bine asa?????????????????????????????????????????????????????????????
+
+
