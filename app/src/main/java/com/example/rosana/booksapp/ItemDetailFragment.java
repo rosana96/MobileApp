@@ -16,8 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.rosana.booksapp.dummy.Content;
-import com.example.rosana.booksapp.model.MailDialog;
+import com.example.rosana.booksapp.dummy.NovelsRepo;
 import com.example.rosana.booksapp.model.Novel;
 
 import static android.content.Intent.createChooser;
@@ -55,7 +54,7 @@ public class ItemDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            novel = Content.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            novel = NovelsRepo.findOne(getArguments().get(ARG_ITEM_ID).toString());
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);

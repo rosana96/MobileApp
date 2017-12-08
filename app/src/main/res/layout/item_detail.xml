@@ -50,7 +50,7 @@
             android:layout_weight="1"
             app:layout_anchor="@+id/item_detail_container"
             app:layout_anchorGravity="right|bottom"
-            app:srcCompat="@android:drawable/stat_notify_chat" />
+            app:srcCompat="@android:drawable/ic_menu_edit" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/mail_button"

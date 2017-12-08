@@ -27,7 +27,36 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <include layout="@layout/item_list" />
+        <include layout="@layout/item_list"
+            android:layout_width="312dp" />
     </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="320dp"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="70dp"
+        android:clickable="true"
+        android:onClick="addNovel"
+        android:visibility="visible"
+        app:fabSize="mini"
+        app:layout_anchorGravity="right"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/chartBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="320dp"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="500dp"
+        android:clickable="true"
+        android:onClick="seeChart"
+        android:visibility="visible"
+        app:fabSize="mini"
+        app:layout_anchorGravity="right"
+        app:srcCompat="@android:drawable/ic_media_rew" />
 
 </android.support.design.widget.CoordinatorLayout>

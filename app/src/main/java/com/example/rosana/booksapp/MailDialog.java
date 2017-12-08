@@ -1,5 +1,5 @@
 
-package com.example.rosana.booksapp.model;
+package com.example.rosana.booksapp;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.rosana.booksapp.R;
+import com.example.rosana.booksapp.model.Novel;
 
 public class MailDialog extends DialogFragment {
 

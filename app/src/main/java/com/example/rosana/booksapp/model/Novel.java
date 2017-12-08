@@ -1,15 +1,35 @@
 package com.example.rosana.booksapp.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity(tableName = "Novels")
 public class Novel {
+    @PrimaryKey
+    @NonNull
     private String id;
+    @ColumnInfo(name = "author")
     private String author;
+
+    @ColumnInfo(name = "title")
     private String title;
+
+    @ColumnInfo(name = "content")
     private String content;
+
+    @ColumnInfo(name = "creation_date")
     private Date creationDate;
+
+    @ColumnInfo(name = "number_of_chapters")
     private int numberOfChapters;
+
+    @ColumnInfo(name = "finished")
     private boolean finished;
 
     public Novel(String id, String author, String title, String content, Date creationDate, int numberOfChapters, boolean finished) {
@@ -22,6 +42,7 @@ public class Novel {
         this.title = title;
     }
 
+    @Ignore
     public Novel() {
         this.author = "Default author";
     }

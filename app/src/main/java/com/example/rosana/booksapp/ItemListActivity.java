@@ -1,21 +1,25 @@
 package com.example.rosana.booksapp;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 
-import com.example.rosana.booksapp.dummy.Content;
+import com.example.rosana.booksapp.dao.AppDatabase;
+import com.example.rosana.booksapp.dummy.NovelsRepo;
 import com.example.rosana.booksapp.model.Novel;
 
 import java.util.List;
@@ -34,7 +38,9 @@ public class ItemListActivity extends AppCompatActivity {
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
+
     private boolean mTwoPane;
+    private NovelsRepo novelsRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,33 +63,107 @@ public class ItemListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+//        GetDbAsync getDbAsync = new GetDbAsync(db);
+//        NovelsRepo.NOVELS = getDbAsync.doInBackground();
+
+
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(Content.ITEMS));
+        novelsRepo = new NovelsRepo(getApplicationContext());
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(NovelsRepo.getAll()));
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.item_list);
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(NovelsRepo.getAll()));
+    }
+
+    @Override
+    protected void onDestroy() {
+//        PopulateDbAsync populateDbAsync = new PopulateDbAsync(db);
+//        populateDbAsync.doInBackground();
+//        db.novelDao().insertAll(NovelsRepo.NOVELS);
+        super.onDestroy();
+    }
+
+    public void addNovel(View view) {
+        Context context = view.getContext();
+        Intent intent = new Intent(context, CreateNovelActivity.class);
+        context.startActivity(intent);
+    }
+
+    public void seeChart(View view) {
+        Context context = view.getContext();
+        Intent intent = new Intent(context, ChartActivity.class);
+        context.startActivity(intent);
+    }
+
+//    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
+//        private final AppDatabase mDb;
+//        PopulateDbAsync(AppDatabase db) {
+//            mDb = db;
+//        }
+//        @Override
+//        protected  Void doInBackground(final Void... params) {
+//            mDb.novelDao().insertAll(NovelsRepo.NOVELS);
+//            return null;
+//        }
+//    }
+//
+//    private static class GetDbAsync extends AsyncTask<Void, Void, List<Novel>> {
+//        private final AppDatabase mDb;
+//        GetDbAsync(AppDatabase db) {
+//            mDb = db;
+//        }
+//        @Override
+//        protected  List<Novel> doInBackground(final Void... params) {
+//           return mDb.novelDao().getAll().getValue();
+//        }
+//    }
+
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<Novel> mValues;
+        private final List<Novel> novels;
 
         public SimpleItemRecyclerViewAdapter(List<Novel> items) {
-            mValues = items;
+            novels = items;
         }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_list_content, parent, false);
+
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).getId());
-            holder.mContentView.setText(mValues.get(position).getTitle());
+            holder.mItem = novels.get(position);
+            holder.mIdView.setText(novels.get(position).getId());
+            holder.mContentView.setText(novels.get(position).getTitle());
+
+            Button button = holder.mView.findViewById(R.id.removeBtn);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+//                    Novel deleted = novels.get(position);
+//                    NovelsRepo.deleteNovel(deleted.getId());
+//                    db.novelDao().delete(deleted);
+//                    db.novelDao().delete(deleted);
+                    NovelsRepo.deleteNovel(novels.get(holder.getAdapterPosition()));
+                    Log.d("delete",Integer.toString(holder.getAdapterPosition()));
+                    View recyclerView = findViewById(R.id.item_list);
+                    setupRecyclerView((RecyclerView)recyclerView);
+                }
+            });
+
+
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -97,19 +177,33 @@ public class ItemListActivity extends AppCompatActivity {
                                 .replace(R.id.item_detail_container, fragment)
                                 .commit();
                     } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
 
-                        context.startActivity(intent);
+                            Context context = v.getContext();
+                            Intent intent = new Intent(context, ItemDetailActivity.class);
+                            intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+
+                            context.startActivity(intent);
+
+
                     }
                 }
             });
+
+            FloatingActionButton addBtn = (FloatingActionButton) findViewById(R.id.addBtn);
+            addBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Context context = view.getContext();
+                    Intent intent = new Intent(context, CreateNovelActivity.class);
+                    context.startActivity(intent);
+                }
+            });
+
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return novels.size();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -130,6 +224,6 @@ public class ItemListActivity extends AppCompatActivity {
                 return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
+
     }
 }
-
