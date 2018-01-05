@@ -32,7 +32,10 @@ public class Novel {
     @ColumnInfo(name = "finished")
     private boolean finished;
 
-    public Novel(String id, String author, String title, String content, Date creationDate, int numberOfChapters, boolean finished) {
+    @ColumnInfo(name = "genre")
+    private String genre;
+
+    public Novel(@NonNull String id, String author, String title, String content, Date creationDate, int numberOfChapters, boolean finished, String genre) {
         this.id = id;
         this.author = author;
         this.content = content;
@@ -40,6 +43,7 @@ public class Novel {
         this.numberOfChapters = numberOfChapters;
         this.finished = finished;
         this.title = title;
+        this.genre = genre;
     }
 
     @Ignore
@@ -101,6 +105,14 @@ public class Novel {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     @Override

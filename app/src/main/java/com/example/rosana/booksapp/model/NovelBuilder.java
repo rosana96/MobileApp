@@ -15,17 +15,19 @@ public class NovelBuilder {
     private int numberOfChapters;
     private boolean finished;
     private String id;
+    private String genre;
 
     public NovelBuilder() {
     }
 
     public NovelBuilder withDefaults() {
-        author = "DefaultAuthor";
+        author = "Default Author";
         title = "Beautiful New Novel " + id;
-        content = "This is an auto-generated novel. Do you like it? It's beautiful, isn't it? :))";
+        content = "Auto-generated content.";
         creationDate = Calendar.getInstance().getTime();
         numberOfChapters = 0;
         finished = false;
+        genre = "";
         return this;
     }
     public NovelBuilder withId(String id) {
@@ -63,9 +65,13 @@ public class NovelBuilder {
         return this;
     }
 
+    public NovelBuilder withGenre(String genre) {
+        this.genre = genre;
+        return this;
+    }
+
     public Novel build() {
-        Novel novel = new Novel(id, author, title, content, creationDate, numberOfChapters,finished);
-        return novel;
+        return new Novel(id, author, title, content, creationDate, numberOfChapters,finished, genre);
     }
 
 }
