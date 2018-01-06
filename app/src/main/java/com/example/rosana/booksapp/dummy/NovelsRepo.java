@@ -1,63 +1,93 @@
 package com.example.rosana.booksapp.dummy;
 
+import android.app.Activity;
+import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
+import com.example.rosana.booksapp.MySubject;
 import com.example.rosana.booksapp.dao.AppDatabase;
+import com.example.rosana.booksapp.model.Chapter;
 import com.example.rosana.booksapp.model.Novel;
 import com.example.rosana.booksapp.model.NovelBuilder;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static android.R.attr.max;
+import javax.security.auth.Subject;
 
-public class NovelsRepo {
+public class NovelsRepo extends MySubject {
 
     private static AppDatabase db;
 
-    public NovelsRepo(Context context) {
-        db = Room.databaseBuilder(context,
-                AppDatabase.class, AppDatabase.DATABASE_NAME).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+    public NovelsRepo() {
     }
-//    /**
-//     * An array of sample (dummy) items.
-//     */
-//    public static List<Novel> NOVELS = new ArrayList<>();
-//
-//
-//    /**
-//     * A map of sample (dummy) items, by ID.
-//     */
-//    public static Map<String, Novel> NOVEL_MAP = new HashMap<>();
+    public static void initializeDb(Context context){
+        db = Room.databaseBuilder(context,
+                AppDatabase.class, AppDatabase.DATABASE_NAME)
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
+                .build();
+    }
 
-    private static int COUNT = 20;
+    public static List<Chapter> getChaptersOfNovel(Novel novel) {
+        return db.chapterDao().loadChaptersSync(novel.getId());
+    }
 
-//    static {
-//        // Add some sample items.
-//        for (int i = 1; i <= COUNT; i++) {
-//            addNovel(createDefaultNovel());
-//        }
-//    }
+    public static Chapter getLastChapterOfNovel(Novel novel) {
+        List<Chapter> chapters = getChaptersOfNovel(novel);
+        if (chapters.isEmpty())
+            return null;
+        return chapters.get(chapters.size()-1);
+    }
 
+    // NOVELS CRUD
     public static void addNovel(Novel novel) {
-        db.novelDao().insertOne(novel);
-//        NOVELS.add(novel);
-//        NOVEL_MAP.put(novel.getId(), novel);
+        try {
+            db.novelDao().insertOne(novel);
+        }
+        catch (Exception e) {
+            updateNovel(novel);
+            e.printStackTrace();
+        }
+        finally {
+            notifyObservers();
+        }
+    }
+
+    public static void updateNovel(Novel novel) {
+        db.novelDao().update(novel);
+        notifyObservers();
     }
 
     public static void deleteNovel(Novel novel) {
         db.novelDao().delete(novel);
-//        Novel n =  NOVEL_MAP.get(id) ;
-//        NOVELS.remove(n);
-//        NOVEL_MAP.remove(id);
+        notifyObservers();
     }
 
     public static List<Novel> getAll() {
         return db.novelDao().getAll();
+    }
+
+    public static Novel findOne(String id) {
+        return db.novelDao().findById(id);
+    }
+
+    public static void insertAll(List<Novel> novels) {
+        db.novelDao().insertAll(novels);
+        notifyObservers();
+    }
+
+    public static void clearNovelList() {
+        db.novelDao().deleteAll();
+        notifyObservers();
+    }
+
+    //CHAPTERS CRUD
+    public static void addChapter(Chapter chapter) {
+        db.chapterDao().insertOne(chapter);
+    }
+
+    public static void updateChapter(Chapter chapter) {
+        db.chapterDao().update(chapter);
     }
 
     private static Novel createDefaultNovel() {
@@ -74,28 +104,23 @@ public class NovelsRepo {
         return builder.toString();
     }
 
-    public static void setNovels(List<Novel> novels) {
-//        NovelsRepo.NOVELS = new ArrayList<>();
-//        NOVEL_MAP = new HashMap<>();
-//        for(Novel n : novels) {
-//            addNovel(n);
-//        }
-    }
 
     public static void delete(final String argItemId) {
         delete(argItemId);
     }
-
-    public static Novel findOne(String id) {
-        return db.novelDao().findById(id);
-    }
+    
 
     public static int maxID() {
         int max = 0;
         for (Novel n : getAll()) {
-            int id = Integer.parseInt(n.getId());
-            if (id > max)
-                max = id;
+            try {
+                int id = Integer.parseInt(n.getId());
+                if (id > max)
+                    max = id;
+            }
+            catch (NumberFormatException ignored) {
+
+            }
         }
         return max;
     }

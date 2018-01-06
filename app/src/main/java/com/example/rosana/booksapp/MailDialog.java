@@ -29,7 +29,7 @@ public class MailDialog extends DialogFragment {
             public void onClick(View v) {
                 String message ="Dear " + nameInput.getText().toString() + ",\n";
                 message += "You subscribed to this novel: \n";
-                message += novel.getContent();
+                message += novel.getTitle();
                 Intent email = new Intent(Intent.ACTION_SEND);
                 email.putExtra(Intent.EXTRA_EMAIL, new String[]{emailInput.getText().toString()});
                 email.putExtra(Intent.EXTRA_SUBJECT, "Novel: " + novel.getTitle());

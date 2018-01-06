@@ -9,7 +9,6 @@ import java.util.Date;
 
 public class NovelBuilder {
     private String author;
-    private String content;
     private String title;
     private Date creationDate;
     private int numberOfChapters;
@@ -23,7 +22,6 @@ public class NovelBuilder {
     public NovelBuilder withDefaults() {
         author = "Default Author";
         title = "Beautiful New Novel " + id;
-        content = "Auto-generated content.";
         creationDate = Calendar.getInstance().getTime();
         numberOfChapters = 0;
         finished = false;
@@ -37,11 +35,6 @@ public class NovelBuilder {
 
     public NovelBuilder withAuthor(String author) {
         this.author = author;
-        return this;
-    }
-
-    public NovelBuilder withContent(String content) {
-        this.content = content;
         return this;
     }
 
@@ -71,7 +64,7 @@ public class NovelBuilder {
     }
 
     public Novel build() {
-        return new Novel(id, author, title, content, creationDate, numberOfChapters,finished, genre);
+        return new Novel(id, author, title, creationDate, numberOfChapters,finished, genre);
     }
 
 }

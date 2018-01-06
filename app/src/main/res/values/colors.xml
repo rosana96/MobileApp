@@ -2,7 +2,8 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ac0205</color>
     <color name="white">#ffffff</color>
     <color name="remove">#ffbfc1</color>
+    <color name="baraDeSus">#ac0205</color>
 </resources>

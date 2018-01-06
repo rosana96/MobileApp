@@ -25,7 +25,6 @@
         android:layout_height="30dp"
         android:layout_margin="16dp"
         android:background="@color/remove"
-        android:onClick="deleteNovel"
         android:text="X" />
 
 </LinearLayout>

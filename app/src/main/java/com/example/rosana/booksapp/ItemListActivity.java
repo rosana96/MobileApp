@@ -3,11 +3,13 @@ package com.example.rosana.booksapp;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,13 +18,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-
-import com.example.rosana.booksapp.dao.AppDatabase;
 import com.example.rosana.booksapp.dummy.NovelsRepo;
 import com.example.rosana.booksapp.model.Novel;
+import com.example.rosana.booksapp.model.NovelBuilder;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.pixplicity.easyprefs.library.Prefs;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import butterknife.BindView;
+import butterknife.OnClick;
+import butterknife.ButterKnife;
 
 /**
  * An activity representing a list of Items. This activity
@@ -32,28 +57,46 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ItemListActivity extends AppCompatActivity {
+public class ItemListActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
+    public static final int MAX_TITLE_LENGTH = 35;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
 
     private boolean mTwoPane;
-    private NovelsRepo novelsRepo;
+    private boolean isAuthenticated;
+    private GoogleApiClient mGoogleApiClient;
+    private DatabaseReference dRef = FirebaseDatabase.getInstance().getReference("novels");
+
+    @BindView(R.id.btn_logOut)
+    Button btnLogOut;
+    @BindView(R.id.item_list)
+    RecyclerView recyclerView;
+
+    private SimpleItemRecyclerViewAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
+        ButterKnife.bind(this);
+        isAuthenticated = Prefs.getBoolean("isAuthenticated", false);
+
+        recyclerView = findViewById(R.id.item_list);
+        adapter = new SimpleItemRecyclerViewAdapter(NovelsRepo.getAll());
+        NovelsRepo.addObserver(adapter);
+        recyclerView.setAdapter(adapter);
+
+        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(manager);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
-        View recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        btnLogOut.setVisibility(isAuthenticated ? View.VISIBLE : View.GONE);
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -63,22 +106,58 @@ public class ItemListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-//        GetDbAsync getDbAsync = new GetDbAsync(db);
-//        NovelsRepo.NOVELS = getDbAsync.doInBackground();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
 
-    }
+        dRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Novel> firebaseNovels = new ArrayList<>();
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+//                    Novel n = ds.getValue(Novel.class);
+                    Map<String, Object> map = (Map<String, Object>) ds.getValue();
+                    String id = ds.getKey();
+                    if (map != null) {
+                        String title = map.get("title").toString();
+                        String genre = map.get("genre").toString();
+                        String author = map.get("author").toString();
+                        boolean finished = Boolean.parseBoolean(map.get("finished").toString());
+                        int numberOfChapters = Integer.parseInt(map.get("numberOfChapters").toString());
+                        DateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                        Date creationDate = new Date();
+                        try {
+                            creationDate = format.parse(map.get("creationDate").toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        Novel n = new Novel(id,author,title,creationDate,numberOfChapters,finished,genre);
+                        firebaseNovels.add(n);
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        novelsRepo = new NovelsRepo(getApplicationContext());
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(NovelsRepo.getAll()));
+                    }
+                }
+                NovelsRepo.clearNovelList();
+                NovelsRepo.insertAll(firebaseNovels);
+//                novels = firebaseNovels;
+//                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("ItemListActivity", "database connection error");
+                Toast.makeText(ItemListActivity.this,"Could not connect to database", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.item_list);
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(NovelsRepo.getAll()));
     }
 
     @Override
@@ -89,16 +168,34 @@ public class ItemListActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    @OnClick(R.id.btn_logOut)
+    public void loginWithGoogle(){
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Intent intent = new Intent(ItemListActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
+
     public void addNovel(View view) {
-        Context context = view.getContext();
-        Intent intent = new Intent(context, CreateNovelActivity.class);
-        context.startActivity(intent);
+        Bundle bundle = new Bundle();
+        startActivity(new Intent(this, CreateNovelActivity.class));
+        finish();
     }
 
     public void seeChart(View view) {
         Context context = view.getContext();
         Intent intent = new Intent(context, ChartActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
 //    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
@@ -126,9 +223,10 @@ public class ItemListActivity extends AppCompatActivity {
 
 
     public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
+            implements Observer  {
 
-        private final List<Novel> novels;
+        private List<Novel> novels;
 
         public SimpleItemRecyclerViewAdapter(List<Novel> items) {
             novels = items;
@@ -145,25 +243,30 @@ public class ItemListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = novels.get(position);
-            holder.mIdView.setText(novels.get(position).getId());
-            holder.mContentView.setText(novels.get(position).getTitle());
+            String pos = (position+1)+"";
+            holder.mIdView.setText(pos);
+            String title = novels.get(position).getTitle();
+            if (title.length() > MAX_TITLE_LENGTH) {
+                title = title.substring(0,MAX_TITLE_LENGTH-3);
+                title +="...";
+            }
 
-            Button button = holder.mView.findViewById(R.id.removeBtn);
-            button.setOnClickListener(new View.OnClickListener() {
+            holder.mContentView.setText(title);
+
+            Button deleteButton = holder.mView.findViewById(R.id.removeBtn);
+            deleteButton.setVisibility(isAuthenticated ? View.VISIBLE : View.GONE);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Novel deleted = novels.get(position);
-//                    NovelsRepo.deleteNovel(deleted.getId());
-//                    db.novelDao().delete(deleted);
-//                    db.novelDao().delete(deleted);
-                    NovelsRepo.deleteNovel(novels.get(holder.getAdapterPosition()));
-                    Log.d("delete",Integer.toString(holder.getAdapterPosition()));
-                    View recyclerView = findViewById(R.id.item_list);
-                    setupRecyclerView((RecyclerView)recyclerView);
+                    final int position = holder.getAdapterPosition();
+                    Novel deletedNovel = novels.get(position);
+                    NovelsRepo.deleteNovel(deletedNovel);
+                    dRef.child(deletedNovel.getId()).removeValue();
+//                    novels.remove(position);
+//                    adapter.notifyItemRemoved(position);
+                    Log.d("delete",Integer.toString(position));
                 }
             });
-
-
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -177,19 +280,16 @@ public class ItemListActivity extends AppCompatActivity {
                                 .replace(R.id.item_detail_container, fragment)
                                 .commit();
                     } else {
-
                             Context context = v.getContext();
                             Intent intent = new Intent(context, ItemDetailActivity.class);
                             intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
-
                             context.startActivity(intent);
-
-
                     }
                 }
             });
 
             FloatingActionButton addBtn = (FloatingActionButton) findViewById(R.id.addBtn);
+            addBtn.setVisibility(isAuthenticated ? View.VISIBLE : View.GONE);
             addBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -198,12 +298,16 @@ public class ItemListActivity extends AppCompatActivity {
                     context.startActivity(intent);
                 }
             });
-
         }
 
         @Override
         public int getItemCount() {
             return novels.size();
+        }
+
+        public void update() {
+            novels = NovelsRepo.getAll();
+            this.notifyDataSetChanged();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -224,6 +328,5 @@ public class ItemListActivity extends AppCompatActivity {
                 return super.toString() + " '" + mContentView.getText() + "'";
             }
         }
-
     }
 }

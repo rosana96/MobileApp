@@ -36,7 +36,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="199dp"
+        android:layout_width="wrap_content"
         android:layout_height="85dp"
         android:layout_marginLeft="40dp"
         android:layout_marginStart="40dp"
@@ -44,19 +44,19 @@
 
         <TextView
             android:id="@+id/chaptersLabel"
-            android:layout_width="140dp"
+            android:layout_width="116dp"
             android:layout_height="match_parent"
             android:paddingTop="15dp"
-            android:text="Nr. of chapters"
+            android:text="Genre"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="italic" />
 
         <NumberPicker
             android:id="@+id/chaptersNrPicker"
-            android:layout_width="52dp"
+            android:layout_width="173dp"
             android:layout_height="wrap_content"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
     </LinearLayout>
 

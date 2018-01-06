@@ -40,6 +40,9 @@ public interface NovelDao {
     @Delete
     void delete(Novel Novel);
 
+    @Query("DELETE FROM Novels")
+    void deleteAll();
+
     @Query("DELETE FROM Novels WHERE id = :id")
     void delete(String id);
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "20286002606",
+    "firebase_url": "https://novels-fc6c8.firebaseio.com",
+    "project_id": "novels-fc6c8",
+    "storage_bucket": "novels-fc6c8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20286002606:android:9caeed674e8f6b81",
+        "android_client_info": {
+          "package_name": "com.example.rosana.booksapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "20286002606-e8krh3j6ne62ah4ref2qs6ool5go9vns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rosana.booksapp",
+            "certificate_hash": "d55332147b32d9238ecdfd02a66efae2ba2903e1"
+          }
+        },
+        {
+          "client_id": "20286002606-iup3ph7c6fna9h5sose76i11qj02lqn0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzPH08xbYMgDTW3EKhKh7RSJXEunt7tZ4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "20286002606-iup3ph7c6fna9h5sose76i11qj02lqn0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

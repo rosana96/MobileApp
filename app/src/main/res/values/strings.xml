@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">BooksApp</string>
-    <string name="title_item_detail">Item Detail</string>
+    <string name="app_name">Novels Mania</string>
+    <string name="title_item_detail">Details</string>
+    <string name="action_settings">Settings</string>
+
+    <!--&lt;!&ndash; Button text &ndash;&gt;-->
+    <!--<string name="btn_logout_from_google">Logout from Google</string>-->
+    <!--<string name="btn_revoke_access">Revoke Access</string>-->
 </resources>

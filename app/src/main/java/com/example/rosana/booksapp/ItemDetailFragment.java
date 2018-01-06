@@ -2,11 +2,11 @@ package com.example.rosana.booksapp;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.rosana.booksapp.dummy.NovelsRepo;
+import com.example.rosana.booksapp.model.Chapter;
 import com.example.rosana.booksapp.model.Novel;
 
 import static android.content.Intent.createChooser;
@@ -57,7 +58,9 @@ public class ItemDetailFragment extends Fragment {
             novel = NovelsRepo.findOne(getArguments().get(ARG_ITEM_ID).toString());
 
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            activity.setTitle(novel.getTitle());
+
+            Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.detail_toolbar);
             if (appBarLayout != null) {
                 appBarLayout.setTitle(novel.getTitle());
             }
@@ -73,19 +76,19 @@ public class ItemDetailFragment extends Fragment {
         final LinearLayout linearLayout = rootView.findViewById(R.id.linear_layout);
         // Show the dummy content as text in a TextView.
         if (novel != null) {
-            textView.setText(novel.getContent());
+            textView.setText(getCurrentChapter(novel).getContent());
             editText.setVisibility(View.GONE);
         }
 
-        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final FloatingActionButton editBtn = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "You can now edit the content", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 textView.setVisibility(View.GONE);
                 editText.setVisibility(View.VISIBLE);
-                editText.setText(novel.getContent());
+                editText.setText(getCurrentChapter(novel).getContent());
 //                fab.setVisibility(View.GONE);
                 editText.requestFocus();
                 getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -115,10 +118,29 @@ public class ItemDetailFragment extends Fragment {
                     textView.setText(cont);
                     textView.setVisibility(View.VISIBLE);
                     editText.setVisibility(View.GONE);
-                    novel.setContent(cont);
+                    Chapter newChapter = getCurrentChapter(novel);
+                    newChapter.setContent(cont);
+                    NovelsRepo.updateChapter(newChapter);
                 }
             }
         });
+
+//        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (!hasFocus) {
+//                    if (editText.getVisibility()==View.VISIBLE) {
+//                        String cont = editText.getText().toString();
+//                        textView.setText(cont);
+//                        textView.setVisibility(View.VISIBLE);
+//                        editText.setVisibility(View.GONE);
+//                        novel.setContent(cont);
+//                        NovelsRepo.updateNovel(novel);
+//                    }
+//                }
+//            }
+//        });
+
 
         FloatingActionButton mail_button = rootView.findViewById(R.id.mail_button);
         mail_button.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +152,12 @@ public class ItemDetailFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    private Chapter getCurrentChapter(Novel novel) {
+        // TODO change this later
+        Chapter ch = NovelsRepo.getLastChapterOfNovel(novel);
+        return ch!=null ? ch : new Chapter();
     }
 
 }
