@@ -7,6 +7,7 @@ import android.content.Context;
 
 import com.example.rosana.booksapp.MySubject;
 import com.example.rosana.booksapp.dao.AppDatabase;
+import com.example.rosana.booksapp.dao.NovelDao_Impl;
 import com.example.rosana.booksapp.model.Chapter;
 import com.example.rosana.booksapp.model.Novel;
 import com.example.rosana.booksapp.model.NovelBuilder;
@@ -79,6 +80,10 @@ public class NovelsRepo extends MySubject {
     public static void clearNovelList() {
         db.novelDao().deleteAll();
         notifyObservers();
+    }
+
+    public static List<Novel> getNovelsWithGenre(String genre) {
+        return db.novelDao().getWithGenre(genre);
     }
 
     //CHAPTERS CRUD

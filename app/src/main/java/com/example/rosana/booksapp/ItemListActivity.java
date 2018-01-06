@@ -260,10 +260,8 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
                 public void onClick(View view) {
                     final int position = holder.getAdapterPosition();
                     Novel deletedNovel = novels.get(position);
-                    NovelsRepo.deleteNovel(deletedNovel);
+//                    NovelsRepo.deleteNovel(deletedNovel);    // not needed anymore... only for offline usasge.. maybe?
                     dRef.child(deletedNovel.getId()).removeValue();
-//                    novels.remove(position);
-//                    adapter.notifyItemRemoved(position);
                     Log.d("delete",Integer.toString(position));
                 }
             });
