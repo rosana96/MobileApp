@@ -4,6 +4,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 @Entity(tableName = "chapters", foreignKeys = {
         @ForeignKey(entity = Novel.class,
@@ -13,25 +14,27 @@ import android.arch.persistence.room.PrimaryKey;
         @Index(value = "novelId")
 })
 public class Chapter {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    @NonNull
+    private String id;
     private String novelId;
     private String name;
     private String content;
 
     public Chapter() { }
 
-    public Chapter(String novelId, String name, String content) {
+    public Chapter(@NonNull String id, String novelId, String name, String content) {
         this.novelId = novelId;
+        this.id = id;
         this.name = name;
         this.content = content;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

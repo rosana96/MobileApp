@@ -8,7 +8,7 @@ import com.example.rosana.booksapp.converter.DateConverter;
 import com.example.rosana.booksapp.model.Chapter;
 import com.example.rosana.booksapp.model.Novel;
 
-@Database(entities = {Novel.class, Chapter.class}, version = 8, exportSchema = false)
+@Database(entities = {Novel.class, Chapter.class}, version = 9, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 

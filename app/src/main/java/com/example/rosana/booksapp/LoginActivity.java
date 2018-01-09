@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
     }
 
     @OnClick(R.id.btn_loginGoogle)
@@ -73,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements
 
     private void transitionToListPage(boolean isAuthenticated) {
         Prefs.putBoolean("isAuthenticated", isAuthenticated);
+        if (mProgressDialog != null)
+            mProgressDialog.dismiss();
         startActivity(new Intent(this, ItemListActivity.class));
         finish();
     }
@@ -150,7 +153,6 @@ public class LoginActivity extends AppCompatActivity implements
             mProgressDialog.setMessage("Loading...");
             mProgressDialog.setIndeterminate(true);
         }
-
         mProgressDialog.show();
     }
 

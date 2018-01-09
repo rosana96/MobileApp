@@ -29,4 +29,7 @@ public interface ChapterDao {
 
     @Update
     void update(Chapter chapter);
+
+    @Query("DELETE FROM chapters")
+    void deleteAll();
 }

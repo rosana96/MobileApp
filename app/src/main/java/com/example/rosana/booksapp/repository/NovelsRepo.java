@@ -1,19 +1,14 @@
-package com.example.rosana.booksapp.dummy;
+package com.example.rosana.booksapp.repository;
 
-import android.app.Activity;
-import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
 import com.example.rosana.booksapp.MySubject;
 import com.example.rosana.booksapp.dao.AppDatabase;
-import com.example.rosana.booksapp.dao.NovelDao_Impl;
 import com.example.rosana.booksapp.model.Chapter;
 import com.example.rosana.booksapp.model.Novel;
 import com.example.rosana.booksapp.model.NovelBuilder;
 import java.util.List;
-
-import javax.security.auth.Subject;
 
 public class NovelsRepo extends MySubject {
 
@@ -98,6 +93,17 @@ public class NovelsRepo extends MySubject {
     private static Novel createDefaultNovel() {
         return new NovelBuilder().withDefaults().build();
 
+    }
+
+    public static void clearChaptersList() {
+        db.chapterDao().deleteAll();
+        notifyObservers();
+    }
+
+
+    public static void insertAllChapters(List<Chapter> chapters) {
+        db.chapterDao().insertAll(chapters);
+        notifyObservers();
     }
 
     private static String makeDetails(int position) {

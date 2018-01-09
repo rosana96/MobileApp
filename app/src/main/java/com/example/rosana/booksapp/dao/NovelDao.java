@@ -46,6 +46,6 @@ public interface NovelDao {
     @Query("DELETE FROM Novels WHERE id = :id")
     void delete(String id);
 
-    @Query("SELECT * FROM Novels WHERE genre = :genre LIMIT 1")
+    @Query("SELECT * FROM Novels WHERE genre = :genre")
     List<Novel> getWithGenre(String genre);
 }

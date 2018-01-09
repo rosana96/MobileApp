@@ -1,10 +1,7 @@
 package com.example.rosana.booksapp;
 
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
-import android.opengl.Visibility;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -20,9 +17,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.rosana.booksapp.dummy.NovelsRepo;
+import com.example.rosana.booksapp.repository.NovelsRepo;
 import com.example.rosana.booksapp.model.Novel;
-import com.example.rosana.booksapp.model.NovelBuilder;
+import com.example.rosana.booksapp.service.NovelsService;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -30,18 +27,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pixplicity.easyprefs.library.Prefs;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -67,8 +56,9 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
 
     private boolean mTwoPane;
     private boolean isAuthenticated;
+    private DatabaseReference novelsRef;
+    private NovelsService novelsService;
     private GoogleApiClient mGoogleApiClient;
-    private DatabaseReference dRef = FirebaseDatabase.getInstance().getReference("novels");
 
     @BindView(R.id.btn_logOut)
     Button btnLogOut;
@@ -114,37 +104,13 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        novelsService = ((BooksApplication) getApplication()).getNovelsService();
+        novelsRef = ((BooksApplication) getApplication()).getNovelsRef();
 
-        dRef.addValueEventListener(new ValueEventListener() {
+        novelsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Novel> firebaseNovels = new ArrayList<>();
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    Novel n = ds.getValue(Novel.class);
-                    Map<String, Object> map = (Map<String, Object>) ds.getValue();
-                    String id = ds.getKey();
-                    if (map != null) {
-                        String title = map.get("title").toString();
-                        String genre = map.get("genre").toString();
-                        String author = map.get("author").toString();
-                        boolean finished = Boolean.parseBoolean(map.get("finished").toString());
-                        int numberOfChapters = Integer.parseInt(map.get("numberOfChapters").toString());
-                        DateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-                        Date creationDate = new Date();
-                        try {
-                            creationDate = format.parse(map.get("creationDate").toString());
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        Novel n = new Novel(id,author,title,creationDate,numberOfChapters,finished,genre);
-                        firebaseNovels.add(n);
-
-                    }
-                }
-                NovelsRepo.clearNovelList();
-                NovelsRepo.insertAll(firebaseNovels);
-//                novels = firebaseNovels;
-//                adapter.notifyDataSetChanged();
+                novelsService.reloadNovels(dataSnapshot);
             }
 
             @Override
@@ -153,6 +119,7 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
                 Toast.makeText(ItemListActivity.this,"Could not connect to database", Toast.LENGTH_LONG).show();
             }
         });
+
     }
 
     @Override
@@ -174,6 +141,7 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
+                        Prefs.remove("personName");
                         Intent intent = new Intent(ItemListActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
@@ -242,10 +210,11 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = novels.get(position);
-            String pos = (position+1)+"";
+            Novel novel = novels.get(position);
+            holder.mItem = novel;
+            String pos = (position+1) + "";
             holder.mIdView.setText(pos);
-            String title = novels.get(position).getTitle();
+            String title = novel.getTitle();
             if (title.length() > MAX_TITLE_LENGTH) {
                 title = title.substring(0,MAX_TITLE_LENGTH-3);
                 title +="...";
@@ -253,15 +222,16 @@ public class ItemListActivity extends AppCompatActivity implements GoogleApiClie
 
             holder.mContentView.setText(title);
 
+            boolean novelBelongsToThisUser = Prefs.getString("personName","none").equals(novel.getAuthor());
             Button deleteButton = holder.mView.findViewById(R.id.removeBtn);
-            deleteButton.setVisibility(isAuthenticated ? View.VISIBLE : View.GONE);
+            deleteButton.setVisibility(isAuthenticated && novelBelongsToThisUser? View.VISIBLE : View.GONE);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     final int position = holder.getAdapterPosition();
-                    Novel deletedNovel = novels.get(position);
+                    Novel deletedNovel = novel;
 //                    NovelsRepo.deleteNovel(deletedNovel);    // not needed anymore... only for offline usasge.. maybe?
-                    dRef.child(deletedNovel.getId()).removeValue();
+                    novelsRef.child(deletedNovel.getId()).removeValue();
                     Log.d("delete",Integer.toString(position));
                 }
             });

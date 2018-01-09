@@ -1,5 +1,5 @@
 
-package com.example.rosana.booksapp;
+package com.example.rosana.booksapp.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -17,7 +17,7 @@ import com.example.rosana.booksapp.model.Novel;
 
 public class MailDialog extends DialogFragment {
 
-    public void GenerateDialog(Context context, final Novel novel, final Activity activity){
+    public void generateDialog(Context context, final Novel novel, final Activity activity){
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.mail_dialog);
@@ -38,6 +38,7 @@ public class MailDialog extends DialogFragment {
                 Intent intent = Intent.createChooser(email, ((String) "Choose an Email client :"));
                 activity.startActivity(intent);
                 dialog.dismiss();
+
 
             }
         });
