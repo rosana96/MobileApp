@@ -1,0 +1,37 @@
+{
+  "name": "NovelsApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "art": "^0.10.1",
+    "react": "^16.2.0",
+    "react-native": "^0.51.0",
+    "react-native-chart": "^1.0.8-beta",
+    "react-native-communications": "^2.2.1",
+    "react-native-deprecated-custom-components": "^0.1.1",
+    "react-native-mail": "^3.0.5",
+    "react-native-mail-compose": "^0.0.6",
+    "react-native-numberpicker": "0.0.5",
+    "react-native-pathjs-charts": "0.0.33",
+    "react-native-pie": "^0.4.0",
+    "react-native-pie-chart": "^1.0.12",
+    "react-native-send-intent": "^1.0.21",
+    "react-native-simple-dialogs": "^0.3.1",
+    "react-native-svg": "4.5.0",
+    "react-navigation": "^1.0.0-beta.21",
+    "react-pathjs-chart": "^0.3.5"
+  },
+  "devDependencies": {
+    "babel-jest": "21.2.0",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "21.2.1",
+    "react-test-renderer": "16.0.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

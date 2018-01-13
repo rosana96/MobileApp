@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "title": "Novel 1",
+    "author": "Vivian Greene",
+    "content": "Life isn't about waiting for the storm to pass. It's about learning how to dance in the rain.",
+    "age": "19-25"
+  },
+  {
+    "id": 2,
+    "title": "Novel 2",
+    "author": "Maya Angelou",
+    "content": "Still, like air, I rise.",
+    "age": "26-30"
+  },
+  {
+    "id": 3,
+    "title": "Novel 3",
+    "author": "Confucius",
+    "content": "Our greatest glory is not in never falling, but in rising every time we fall.",
+    "age": "14-18"
+  },
+  {
+    "id": 4,
+    "title": "Novel 11",
+    "author": "Vivian Greene",
+    "content": "Life isn't about waiting for the storm to pass. It's about learning how to dance in the rain.",
+    "age": "14-18"
+  },
+  {
+    "id": 5,
+    "title": "Novel 22",
+    "author": "Maya Angelou",
+    "content": "Still, like air, I rise.",
+    "age": "30+"
+  },
+  {
+    "id": 6,
+    "title": "Novel 33",
+    "author": "Confucius",
+    "content": "Our greatest glory is not in never falling, but in rising every time we fall.",
+    "age": "14-18"
+  },
+  {
+    "id": 7,
+    "title": "Novel 111",
+    "author": "Vivian Greene",
+    "content": "Life isn't about waiting for the storm to pass. It's about learning how to dance in the rain.",
+    "age": "19-25"
+  },
+  {
+    "id": 8,
+    "title": "Novel 222",
+    "author": "Maya Angelou",
+    "content": "Still, like air, I rise.",
+    "age": "14-18"
+  },
+  {
+    "id": 9,
+    "title": "Novel 333",
+    "author": "Confucius",
+    "content": "Our greatest glory is not in never falling, but in rising every time we fall.",
+    "age": "30+"
+  }
+]
